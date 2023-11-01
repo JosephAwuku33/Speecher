@@ -1,4 +1,3 @@
-//import React from 'react'
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -35,8 +34,45 @@ import text from "../assets/text.png";
 import saved from "../assets/bookmark.png";
 import cloud_upload from "../assets/upload-cloud-02.png";
 import { transcribedData } from "@/data/transcribedFiles";
+import { useState, ChangeEvent } from "react";
 
 export default function MainPage() {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      console.log(selectedFile?.name.toString());
+    }
+  };
+
+  const handleUpload = async () => {
+    //const fileToUse = selectedFile?.name.toString() as string;
+    const url = "https://ardic-speech-to-text-service.p.rapidapi.com/stt";
+    const data = new FormData();
+    data.append("file", selectedFile as File);
+    data.append("args", '{"return_type": "json", "stt_engine": "vosk"}');
+
+    const options = {
+      method: "POST",
+      ContentType: "",
+      headers: {
+        "X-RapidAPI-Key": "7fc25dd236msh21d233b821100bep15d677jsn04b75890813d",
+        "X-RapidAPI-Host": "ardic-speech-to-text-service.p.rapidapi.com",
+      },
+      body: data,
+    };
+    try {
+      if (selectedFile) {
+        const response = await fetch(url, options);
+        const result = await response.text();
+        console.log(result);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <section className="h-screen bg-slate-50 mt-3 font-inter p-4">
       <Dialog>
@@ -152,20 +188,33 @@ export default function MainPage() {
                 </SelectContent>
               </Select>
               <div className="flex flex-col mt-4 items-center w-full h-40 gap-1 rounded-lg border">
-                <div className="rounded-full bg-slate-100 p-4 mt-6">
+                <Label className="rounded-full bg-slate-100 p-4 mt-6">
+                  <input
+                    type="file"
+                    onChange={handleFileChange}
+                    accept=".mp3, .mp4, .wav, .diff, .m4a, .wmv, .avi, .cat"
+                    style={{ display: "none" }}
+                  />
                   <img src={cloud_upload} width={15} height={15} />
-                </div>
+                </Label>
                 <Label className="font-normal">
-                  <a href="#" className="hover:text-orange-950 text-blue-900">
+                  <Label className="hover:text-orange-950 text-blue-900">
+                    <input
+                      type="file"
+                      onChange={handleFileChange}
+                      accept=".mp3, .mp4, .wav, .diff, .m4a, .wmv, .avi, .cat"
+                      style={{ display: "none" }}
+                    />
                     Click to upload
-                  </a>{" "}
+                  </Label>{" "}
                   or drag and drop
                 </Label>
                 <Label className="font-light text-sm ">
                   The maximum file size is 1GB for audio and 10GB for video
                 </Label>
                 <Label className="font-light text-sm ">
-                  Supported File formats are mp3, mp4, wav, diff, m4a, wmv, avi, cat
+                  Supported File formats are mp3, mp4, wav, diff, m4a, wmv, avi,
+                  cat
                 </Label>
               </div>
 
@@ -191,7 +240,9 @@ export default function MainPage() {
             </div>
           </DialogHeader>
           <DialogFooter className="w-full mt-2">
-            <Button className="w-full bg-blue-700">Transcribe File</Button>
+            <Button onClick={handleUpload} className="w-full bg-blue-700">
+              Transcribe File
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
