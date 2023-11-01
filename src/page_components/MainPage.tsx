@@ -36,6 +36,8 @@ import cloud_upload from "../assets/upload-cloud-02.png";
 import { transcribedData } from "@/data/transcribedFiles";
 import { useState, ChangeEvent } from "react";
 
+
+
 export default function MainPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -43,6 +45,8 @@ export default function MainPage() {
     if (file) {
       setSelectedFile(file);
       console.log(selectedFile?.name.toString());
+      console.log(import.meta.env.VITE_REACT_RAPIDAPI_KEY);
+      console.log(import.meta.env.VITE_REACT_RAPIDAPI_HOST);
     }
   };
 
@@ -57,8 +61,8 @@ export default function MainPage() {
       method: "POST",
       ContentType: "",
       headers: {
-        "X-RapidAPI-Key": "7fc25dd236msh21d233b821100bep15d677jsn04b75890813d",
-        "X-RapidAPI-Host": "ardic-speech-to-text-service.p.rapidapi.com",
+        "X-RapidAPI-Key":JSON.stringify(import.meta.env.VITE_REACT_RAPIDAPI_KEY),
+        "X-RapidAPI-Host": JSON.stringify(import.meta.env.VITE_REACT_RAPIDAPI_HOST),
       },
       body: data,
     };
