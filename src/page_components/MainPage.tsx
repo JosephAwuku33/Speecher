@@ -34,52 +34,76 @@ import text from "../assets/text.png";
 import saved from "../assets/bookmark.png";
 import cloud_upload from "../assets/upload-cloud-02.png";
 import { transcribedData } from "@/data/transcribedFiles";
-import { useState, ChangeEvent } from "react";
-
+import { useState, ChangeEvent, CSSProperties } from "react";
+import { handleTranscription } from "@/api/SpeechToText";
+import ScaleLoader from "react-spinners/ScaleLoader";
+import { DialogClose } from "@radix-ui/react-dialog";
+import { saveAs } from 'file-saver';
 
 
 export default function MainPage() {
+  const override: CSSProperties = {
+    display: "block",
+    margin: "0 auto",
+    borderColor: "red",
+  };
+
+  const [loading, setLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFileLink, setSelectedFileLink] = useState<string>("");
+
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       setSelectedFile(file);
       console.log(selectedFile?.name.toString());
-      console.log(import.meta.env.VITE_REACT_RAPIDAPI_KEY);
-      console.log(import.meta.env.VITE_REACT_RAPIDAPI_HOST);
     }
   };
 
-  const handleUpload = async () => {
-    //const fileToUse = selectedFile?.name.toString() as string;
-    const url = "https://ardic-speech-to-text-service.p.rapidapi.com/stt";
-    const data = new FormData();
-    data.append("file", selectedFile as File);
-    data.append("args", '{"return_type": "json", "stt_engine": "vosk"}');
+  const validateURL = (URL: string) => {
+    if (URL == "") {
+      alert("Empty text field");
+      return;
+    }
+    const urlPattern = /^(https?:\/\/)?([\w-]+(\.[\w-]+)+\/?)(:\d+)?(\/\S*)?$/;
+    return urlPattern.test(URL);
+  };
 
-    const options = {
-      method: "POST",
-      ContentType: "",
-      headers: {
-        "X-RapidAPI-Key":JSON.stringify(import.meta.env.VITE_REACT_RAPIDAPI_KEY),
-        "X-RapidAPI-Host": JSON.stringify(import.meta.env.VITE_REACT_RAPIDAPI_HOST),
-      },
-      body: data,
-    };
+  const handleUpload = async () => {
+    setLoading(true);
     try {
-      if (selectedFile) {
-        const response = await fetch(url, options);
-        const result = await response.text();
-        console.log(result);
+      if (validateURL(selectedFileLink)) {
+        const response = await handleTranscription(selectedFileLink);
+        console.log(response);
+        setLoading(false);
+        alert("Audio successfully transcripted");
+        const blob = new Blob([response.transcript.text as BlobPart],  { type: 'text/plain;charset=utf-8' });
+        try {
+          saveAs(blob, 'transcripted.txt');
+          alert("File Downloaded Successfully");
+        } catch ( err) {
+          console.error(err);
+        }
       }
     } catch (err) {
       console.error(err);
+      alert("There was a problem with the transcription");
+      setLoading(false);
     }
   };
 
   return (
     <section className="h-screen bg-slate-50 mt-3 font-inter p-4">
       <Dialog>
+        {loading && (
+          <div className="flex justify-center items-center h-full fixed inset-0 bg-black bg-opacity-50 z-50">
+            <ScaleLoader
+              color={"#123abc"}
+              loading={loading}
+              cssOverride={override}
+            />
+          </div>
+        )}
         <div className="flex flex-row relative justify-start space-x-96">
           <div className="flex flex-col justify-start mt-2">
             <Label className="font-bold text-lg">Welcome Shakirat</Label>
@@ -192,15 +216,29 @@ export default function MainPage() {
                 </SelectContent>
               </Select>
               <div className="flex flex-col mt-4 items-center w-full h-40 gap-1 rounded-lg border">
-                <Label className="rounded-full bg-slate-100 p-4 mt-6">
-                  <input
-                    type="file"
-                    onChange={handleFileChange}
-                    accept=".mp3, .mp4, .wav, .diff, .m4a, .wmv, .avi, .cat"
-                    style={{ display: "none" }}
-                  />
-                  <img src={cloud_upload} width={15} height={15} />
-                </Label>
+                {selectedFile ? (
+                  <div className="mt-2 p-2">
+                    <img
+                      src={folder}
+                      width={30}
+                      height={30}
+                      alt="Uploaded File"
+                    />
+                    <Label className="font-inter text-center">
+                      {selectedFile.name}
+                    </Label>
+                  </div>
+                ) : (
+                  <Label className="rounded-full bg-slate-100 p-4 mt-6">
+                    <input
+                      type="file"
+                      onChange={handleFileChange}
+                      accept="audio/*"
+                      style={{ display: "none" }}
+                    />
+                    <img src={cloud_upload} width={15} height={15} />
+                  </Label>
+                )}
                 <Label className="font-normal">
                   <Label className="hover:text-orange-950 text-blue-900">
                     <input
@@ -227,6 +265,10 @@ export default function MainPage() {
                   Import from Link
                 </Label>
                 <Input
+                  value={selectedFileLink}
+                  onChange={(event) => {
+                    setSelectedFileLink(event.target.value);
+                  }}
                   type="email"
                   id="email"
                   placeholder="Paste a DropBox, Google Drive or YouTube URL, here"
@@ -244,9 +286,11 @@ export default function MainPage() {
             </div>
           </DialogHeader>
           <DialogFooter className="w-full mt-2">
-            <Button onClick={handleUpload} className="w-full bg-blue-700">
-              Transcribe File
-            </Button>
+            <DialogClose asChild>
+              <Button onClick={handleUpload} className="w-full bg-blue-700">
+                Transcribe File
+              </Button>
+            </DialogClose>
           </DialogFooter>
         </DialogContent>
       </Dialog>
