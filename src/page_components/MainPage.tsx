@@ -80,9 +80,10 @@ export default function MainPage() {
         const blob = new Blob([response.transcript.text as BlobPart],  { type: 'text/plain;charset=utf-8' });
         try {
           saveAs(blob, 'transcripted.txt');
-          alert("File Downloaded Successfully");
+          alert("File about to be Downloaded");
         } catch ( err) {
           console.error(err);
+          alert("Download having issues??...");
         }
       }
     } catch (err) {
