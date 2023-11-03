@@ -1,27 +1,39 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Speecher ABC
 
-Currently, two official plugins are available:
+A Transcription Based Website
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Expanding the ESLint configuration
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Tech Stack
 
-- Configure the top-level `parserOptions` property like this:
+- **Assembly AI**
+- **React**
+- **Typescript**
+- **Vite**
+- **Tailwind CSS**
+- **Shadcn UI**
 
-```js
-   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-   },
-```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+
+## Features
+
+- Audio transcription
+- Light and Dark toggle mode, **coming soon**
+- Fullscreen mode
+
+
+
+## Acknowledgements
+
+ - [Assembly AI](https://www.assemblyai.com)
+
+
+## Usage
+- In order to use this site at the moment you'll need to host an audio file on a storage based cloud platform, a working example would be JukeHost
+
+- [JukeHost tutorial](https://gist.github.com/Moutard3/b925b090ab1d6d20a5d20f054bae7bca#mp3-direct-link-hosting)
+
+- After uploading the file and selecting the link to the audio, you can paste that in the import link input box on the dialog box that appears when the Transcribe Button is clicked.
+
+- A transcripted file of the audio would be downloaded and VOILA, that's it.
