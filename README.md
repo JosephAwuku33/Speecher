@@ -43,4 +43,5 @@ A Transcription Based Website
 ## Demo
 
 [SpeecherABC Demo](https://speecherabc.netlify.app)
+- (Desktop Mode Only for now)
 
